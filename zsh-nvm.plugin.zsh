@@ -49,7 +49,6 @@ _zsh_nvm_global_binaries() {
 }
 
 _zsh_nvm_load() {
-  [[ "$NVM_AUTO_USE" == true ]] && _zsh_nvm_auto_use
 
   # Source nvm (check if `nvm use` should be ran after load)
   if [[ "$NVM_NO_USE" == true ]]; then
@@ -76,6 +75,8 @@ _zsh_nvm_load() {
         ;;
     esac
   }
+  
+  [[ "$NVM_AUTO_USE" == true ]] && _zsh_nvm_auto_use
 }
 
 _zsh_nvm_completion() {
