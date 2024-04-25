@@ -73,7 +73,7 @@ For example, if you are using antigen, you would put the following in your `.zsh
 
 ```shell
 export NVM_LAZY_LOAD=true
-antigen bundle lukechilds/zsh-nvm
+antigen bundle Logicer16/zsh-nvm
 ```
 
 Performance comparison:
@@ -85,6 +85,9 @@ Performance comparison:
 % time (_zsh_nvm_lazy_load)
 ( _zsh_nvm_lazy_load; )  0.01s user 0.01s system 168% cpu 0.012 total
 ```
+
+> [!WARNING]
+> Lazy loading is discouraged as it may cause unexpected behaviour. If a program or script which requires a lazily loaded binary is called before nvm is loaded, those binaries will be unavailable. This is because these binaries are wrapped in a zsh function and zsh functions cannot be used outside of the shell instance that they were defined in.
 
 #### Extra commands to trigger lazy loading
 By default lazy loading nvm is triggered by running any binary installed by nvm (`nvm`, `node`, `npm`, `yarn`, `pnpm`, `corepack`, etc.) or any installed npm global binaries.
