@@ -1,0 +1,41 @@
+name: Test
+
+on: [push, pull_request]
+
+jobs:
+  Test:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+    steps:
+      - name: Install zsh
+        run: |
+          sudo apt-get update
+          sudo apt-get install zsh
+        if: matrix.os == 'ubuntu-latest'
+
+      - name: Install zsh
+        run: |
+          brew update
+          brew install zsh
+        if: matrix.os == 'macos-latest'
+
+      - name: Initialise
+        run: |
+          zsh --version
+          sudo rm -rf /usr/local/{lib/node{,/.npm,_modules},bin,share/man}/{npm*,node*,man1/node*}
+          if [[ $(command -v nvm) == "nvm" ]]; then nvm deactivate && nvm unload; fi
+        
+      - name: Remove Homebrew node
+        run: if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew uninstall node; fi
+        if: matrix.os == 'macos-latest'
+        
+      - name: Install Urchin
+        run: |
+          (mkdir /tmp/urchin && cd /tmp/urchin && curl -s "$(curl -s https://registry.npmjs.com/urchin | grep -Eo '"tarball":\s*"[^"]+"' | tail -n 1 | awk -F\" '{ print $4 }')" -O && tar -x -f urchin*)
+          chmod +x /tmp/urchin/package/urchin
+        
+      - name: Run tests
+        run: /tmp/urchin/package/urchin -s zsh tests
+        
