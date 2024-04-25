@@ -7,32 +7,31 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ubuntu-latest, macos-latest]
+        os: [macos-latest, ubuntu-latest]
     steps:
       - name: Checkout
         uses: actions/checkout@v4
         
-      - name: Install zsh
+      - name: Install Dependancies
         run: |
           sudo apt-get update
           sudo apt-get install zsh
+          mkdir $(pwd)/tests/.nvm
+          curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.7/install.sh | NVM_DIR="$(pwd)/tests/.nvm" bash
         if: matrix.os == 'ubuntu-latest'
 
-      - name: Install zsh
+      - name: Install Dependancies
         run: |
           brew update
-          brew install zsh
+          brew install zsh nvm
+          brew uninstall node || true
         if: matrix.os == 'macos-latest'
 
       - name: Initialise
         run: |
           zsh --version
-          sudo rm -rf /usr/local/{lib/node{,/.npm,_modules},bin,share/man}/{npm*,node*,man1/node*}
+          sudo rm -rf /{usr/local,opt/homebrew}/{lib/node{,/.npm,_modules},bin,share/man}/{npm*,node*,man1/node*}
           if [[ $(command -v nvm) == "nvm" ]]; then nvm deactivate && nvm unload; fi
-        
-      - name: Remove Homebrew node
-        run: if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew uninstall node; fi
-        if: matrix.os == 'macos-latest'
         
       - name: Install Urchin
         run: |
@@ -40,5 +39,6 @@ jobs:
           chmod +x /tmp/urchin/package/urchin
         
       - name: Run tests
-        run: /tmp/urchin/package/urchin -s zsh tests
+        run: |
+          /tmp/urchin/package/urchin -s zsh tests
         

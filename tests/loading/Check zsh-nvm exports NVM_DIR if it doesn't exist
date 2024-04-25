@@ -13,5 +13,8 @@ unset NVM_DIR
 # Load zsh-nvm
 load_zsh_nvm
 
+expected_nvm_dir=$([ -z "${XDG_CONFIG_HOME-}" ] && printf %s "${HOME}/.nvm" || printf %s "${XDG_CONFIG_HOME}/nvm")
+expected_nvm_dir_readable=$([ -z "${XDG_CONFIG_HOME-}" ] && printf %s "\$HOME/.nvm" || printf %s "\${XDG_CONFIG_HOME}/nvm")
+
 # Check NVM_DIR is now set to our default
-[[ "$NVM_DIR" == "$HOME/.nvm" ]] || die "NVM_DIR wasn't set to \$HOME/.nvm"
+[[ "$NVM_DIR" == "$expected_nvm_dir" ]] || die "\$NVM_DIR wasn't set to $expected_nvm_dir_readable"

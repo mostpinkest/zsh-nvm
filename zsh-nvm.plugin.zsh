@@ -1,7 +1,8 @@
 ZSH_NVM_DIR=${0:a:h}
 
-export NVM_DIR="$(_zsh_nvm_install_dir)"
-export NVM_SYS_DIR="$(nvm_system_install_dir)"
+_zsh_nvm_has() {
+  type "$1" > /dev/null 2>&1
+}
 
 nvm_system_install_dir() {
   if _zsh_nvm_has brew && ls $(brew --prefix)/opt/ | grep -q nvm; then
@@ -27,10 +28,6 @@ _zsh_nvm_rename_function() {
   test -n "$(declare -f $1)" || return
   eval "${_/$1/$2}"
   unset -f $1
-}
-
-_zsh_nvm_has() {
-  type "$1" > /dev/null 2>&1
 }
 
 _zsh_nvm_global_binaries() {
@@ -162,6 +159,9 @@ _zsh_nvm_install_wrapper() {
       ;;
   esac
 }
+
+export NVM_DIR="$(_zsh_nvm_install_dir)"
+export NVM_SYS_DIR="$(nvm_system_install_dir)"
 
 # Don't init anything if this is true (debug/testing only)
 if [[ "$ZSH_NVM_NO_LOAD" != true ]]; then

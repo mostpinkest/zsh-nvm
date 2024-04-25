@@ -31,6 +31,8 @@ node --version || die "couldn't run lazy loader"
 # Check nvm is not a lazy load function
 [[ $(which nvm) != *"_zsh_nvm_load"* ]] || die "nvm should not be a lazy load function"
 
+echo $path
+echo "$(nvm_version_path $node_version)/bin/node"
 # Check node is a binary
 [[ "$(command -v node)" == "$(nvm_version_path $node_version)/bin/node" ]] || die "node should now be a binary"
 

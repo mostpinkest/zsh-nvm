@@ -22,11 +22,12 @@ load_zsh_nvm
 # Check nvm is a lazy load function
 [[ $(which nvm) == *"_zsh_nvm_load"* ]] || die "nvm should be a lazy load function"
 
+which node
 # Check node is not available
-[[ "$(command -v node)" == "" ]] || die "node should not be available"
+[[ "$(command -v node)" == "" ]] || die "node should not be available (pre-load)"
 
 # Check npm is not available
-[[ "$(command -v npm)" == "" ]] || die "npm should not be available"
+[[ "$(command -v npm)" == "" ]] || die "npm should not be available (pre-load)"
 
 # Init lazy loader
 nvm --version || die "couldn't run lazy loader"
@@ -35,10 +36,10 @@ nvm --version || die "couldn't run lazy loader"
 [[ $(which nvm) != *"_zsh_nvm_load"* ]] || die "nvm should not be a lazy load function"
 
 # Check node is still not available
-[[ "$(command -v node)" == "" ]] || die "node should not be available"
+[[ "$(command -v node)" == "" ]] || die "node should not be available(post-load)"
 
 # Check npm is still not available
-[[ "$(command -v npm)" == "" ]] || die "npm should not be available"
+[[ "$(command -v npm)" == "" ]] || die "npm should not be available (post-load)"
 
 # Manually load node
 nvm use "$node_version"
