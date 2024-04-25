@@ -1,6 +1,27 @@
 ZSH_NVM_DIR=${0:a:h}
 
-[[ -z "$NVM_DIR" ]] && export NVM_DIR="$HOME/.nvm"
+export NVM_DIR="$(_zsh_nvm_install_dir)"
+export NVM_SYS_DIR="$(nvm_system_install_dir)"
+
+nvm_system_install_dir() {
+  if _zsh_nvm_has brew && ls $(brew --prefix)/opt/ | grep -q nvm; then
+    echo "$(brew --prefix)/opt/nvm"
+  else
+    echo $NVM_DIR
+  fi
+}
+
+_zsh_nvm_default_install_dir() {
+  [ -z "${XDG_CONFIG_HOME-}" ] && printf %s "${HOME}/.nvm" || printf %s "${XDG_CONFIG_HOME}/nvm"
+}
+
+_zsh_nvm_install_dir() {
+  if [ -n "$NVM_DIR" ]; then
+    printf %s "${NVM_DIR}"
+  else
+    _zsh_nvm_default_install_dir
+  fi
+}
 
 _zsh_nvm_rename_function() {
   test -n "$(declare -f $1)" || return
@@ -12,24 +33,14 @@ _zsh_nvm_has() {
   type "$1" > /dev/null 2>&1
 }
 
-_zsh_nvm_latest_release_tag() {
-  echo $(builtin cd "$NVM_DIR" && git fetch --quiet --tags origin && git describe --abbrev=0 --tags --match "v[0-9]*" $(git rev-list --tags --max-count=1))
-}
-
-_zsh_nvm_install() {
-  echo "Installing nvm..."
-  git clone https://github.com/nvm-sh/nvm.git "$NVM_DIR"
-  $(builtin cd "$NVM_DIR" && git checkout --quiet "$(_zsh_nvm_latest_release_tag)")
-}
-
 _zsh_nvm_global_binaries() {
 
   # Look for global binaries
-  local global_binary_paths="$(echo "$NVM_DIR"/v0*/bin/*(N) "$NVM_DIR"/versions/*/*/bin/*(N))"
+  local global_binary_paths=$(echo "$NVM_DIR"/v0*/bin/*(N) "$NVM_DIR"/versions/*/*/bin/*(N))
 
   # If we have some, format them
   if [[ -n "$global_binary_paths" ]]; then
-    echo "$NVM_DIR"/v0*/bin/*(N) "$NVM_DIR"/versions/*/*/bin/*(N) |
+    echo $global_binary_paths |
       xargs -n 1 basename |
       sort |
       uniq
@@ -37,12 +48,13 @@ _zsh_nvm_global_binaries() {
 }
 
 _zsh_nvm_load() {
+  [[ "$NVM_AUTO_USE" == true ]] && _zsh_nvm_auto_use
 
   # Source nvm (check if `nvm use` should be ran after load)
   if [[ "$NVM_NO_USE" == true ]]; then
-    source "$NVM_DIR/nvm.sh" --no-use
+    source "$NVM_SYS_DIR/nvm.sh" --no-use
   else
-    source "$NVM_DIR/nvm.sh"
+    source "$NVM_SYS_DIR/nvm.sh"
   fi
 
   # Rename main nvm function
@@ -51,12 +63,6 @@ _zsh_nvm_load() {
   # Wrap nvm in our own function
   nvm() {
     case $1 in
-      'upgrade')
-        _zsh_nvm_upgrade
-        ;;
-      'revert')
-        _zsh_nvm_revert
-        ;;
       'use')
         _zsh_nvm_nvm "$@"
         export NVM_AUTO_USE_ACTIVE=false
@@ -74,7 +80,7 @@ _zsh_nvm_load() {
 _zsh_nvm_completion() {
 
   # Add provided nvm completion
-  [[ -r $NVM_DIR/bash_completion ]] && source $NVM_DIR/bash_completion
+  [[ -r $NVM_SYS_DIR/bash_completion ]] && source $NVM_SYS_DIR/bash_completion
 }
 
 _zsh_nvm_lazy_load() {
@@ -116,53 +122,6 @@ _zsh_nvm_lazy_load() {
   done
 }
 
-nvm_update() {
-  echo 'Deprecated, please use `nvm upgrade`'
-}
-_zsh_nvm_upgrade() {
-
-  # Use default upgrade if it's built in
-  if [[ -n "$(_zsh_nvm_nvm help | grep 'nvm upgrade')" ]]; then
-    _zsh_nvm_nvm upgrade
-    return
-  fi
-
-  # Otherwise use our own
-  local installed_version=$(builtin cd "$NVM_DIR" && git describe --tags)
-  echo "Installed version is $installed_version"
-  echo "Checking latest version of nvm..."
-  local latest_version=$(_zsh_nvm_latest_release_tag)
-  if [[ "$installed_version" = "$latest_version" ]]; then
-    echo "You're already up to date"
-  else
-    echo "Updating to $latest_version..."
-    echo "$installed_version" > "$ZSH_NVM_DIR/previous_version"
-    $(builtin cd "$NVM_DIR" && git fetch --quiet && git checkout "$latest_version")
-    _zsh_nvm_load
-  fi
-}
-
-_zsh_nvm_previous_version() {
-  cat "$ZSH_NVM_DIR/previous_version" 2>/dev/null
-}
-
-_zsh_nvm_revert() {
-  local previous_version="$(_zsh_nvm_previous_version)"
-  if [[ -n "$previous_version" ]]; then
-    local installed_version=$(builtin cd "$NVM_DIR" && git describe --tags)
-    if [[ "$installed_version" = "$previous_version" ]]; then
-      echo "Already reverted to $installed_version"
-      return
-    fi
-    echo "Installed version is $installed_version"
-    echo "Reverting to $previous_version..."
-    $(builtin cd "$NVM_DIR" && git checkout "$previous_version")
-    _zsh_nvm_load
-  else
-    echo "No previous version found"
-  fi
-}
-
 autoload -U add-zsh-hook
 _zsh_nvm_auto_use() {
   _zsh_nvm_has nvm_find_nvmrc || return
@@ -180,7 +139,7 @@ _zsh_nvm_auto_use() {
     fi
   elif [[ "$node_version" != "$(nvm version default)" ]] && [[ "$NVM_AUTO_USE_ACTIVE" = true ]]; then
     echo "Reverting to nvm default version"
-    nvm use default
+    nvm use default && export NVM_AUTO_USE_ACTIVE=true
   fi
 }
 
@@ -207,11 +166,8 @@ _zsh_nvm_install_wrapper() {
 # Don't init anything if this is true (debug/testing only)
 if [[ "$ZSH_NVM_NO_LOAD" != true ]]; then
 
-  # Install nvm if it isn't already installed
-  [[ ! -f "$NVM_DIR/nvm.sh" ]] && _zsh_nvm_install
-
   # If nvm is installed
-  if [[ -f "$NVM_DIR/nvm.sh" ]]; then
+  if [[ -f "$NVM_SYS_DIR/nvm.sh" ]]; then
 
     # Load it
     [[ "$NVM_LAZY_LOAD" == true ]] && _zsh_nvm_lazy_load || _zsh_nvm_load
@@ -220,7 +176,7 @@ if [[ "$ZSH_NVM_NO_LOAD" != true ]]; then
     [[ "$NVM_COMPLETION" == true ]] && _zsh_nvm_completion
     
     # Auto use nvm on chpwd
-    [[ "$NVM_AUTO_USE" == true ]] && add-zsh-hook chpwd _zsh_nvm_auto_use && _zsh_nvm_auto_use
+    [[ "$NVM_AUTO_USE" == true ]] && add-zsh-hook chpwd _zsh_nvm_auto_use
   fi
 
 fi
