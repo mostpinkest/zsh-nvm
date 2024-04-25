@@ -1,47 +1,19 @@
-# zsh-nvm [![Build Status](https://travis-ci.org/lukechilds/zsh-nvm.svg?branch=master)](https://travis-ci.org/lukechilds/zsh-nvm)
+# zsh-nvm
 
-> Zsh plugin for installing, updating and loading `nvm`
+> Zsh plugin for loading `nvm`
+![GitHub Actions Test Status](https://img.shields.io/github/actions/workflow/status/Logicer16/zsh-nvm/test.yml?label=test)
 
-[![GitHub Donate](https://badgen.net/badge/GitHub/Sponsor/D959A7?icon=github)](https://github.com/sponsors/lukechilds)
-[![Bitcoin Donate](https://badgen.net/badge/Bitcoin/Donate/F19537?icon=bitcoin)](https://lu.ke/tip/bitcoin)
-[![Lightning Donate](https://badgen.net/badge/Lightning/Donate/F6BC41?icon=bitcoin-lightning)](https://lu.ke/tip/lightning)
+[`nvm`](https://github.com/nvm-sh/nvm) is an awesome tool but it can be kind of a pain to install and keep up to date. This zsh plugin removes the need for you to configure nvm yourself in most cases, so you never worry about it again.
 
-[`nvm`](https://github.com/nvm-sh/nvm) is an awesome tool but it can be kind of a pain to install and keep up to date. This zsh plugin allows you to quickly setup `nvm` once, save it in your dotfiles, then never worry about it again.
-
-The plugin will install the latest stable release of `nvm` if you don't already have it, and then automatically `source` it for you. You can upgrade `nvm` to the latest version whenever you want without losing your installed `node` versions by running `nvm upgrade`.
+The plugin will automatically `source` your installed version of `nvm` for you.
 
 Although this is written as a zsh plugin, it also works with bash if you follow the [manual installation instructions](#manually).
 
 ## Usage
 
-Once the plugin's installed `nvm` will be available. You'll probably want to load this as one of your first plugins so `node`/`npm` is available for any other plugins that may require them.
+Once the plugin's installed, `nvm` will be available. You'll probably want to load this as one of your first plugins so `node`/`npm` is available for any other plugins that may require them.
 
 `zsh-nvm` also wraps `nvm` in some additional functionality.
-
-### Upgrade
-
-If you want to upgrade to the latest release of `nvm`:
-
-```shell
-% nvm upgrade
-Installed version is v0.31.0
-Checking latest version of nvm...
-Updating to v0.31.3...
-Previous HEAD position was 2176894... v0.31.0
-HEAD is now at 56417f8... v0.31.3
-```
-
-### Revert
-
-If an upgrade breaks something don't worry, reverting back to the previously installed version is simple:
-
-```shell
-% nvm revert
-Installed version is v0.31.3
-Reverting to v0.31.0...
-Previous HEAD position was 56417f8... v0.31.3
-HEAD is now at 2176894... v0.31.0
-```
 
 ### Install
 
@@ -72,21 +44,22 @@ For example, if you are using antigen, you would put the following in your `.zsh
 
 ```shell
 export NVM_DIR="$HOME/.custom-nvm-dir"
-antigen bundle lukechilds/zsh-nvm
+antigen bundle Logicer16/zsh-nvm
 ```
 
-Note: If `nvm` doesn't exist in this directory it'll be automatically installed when you start a session.
+> [!NOTE]
+>  If `nvm` has instead been installed using `brew`, this will be used for initialisation and shell completions instead. `$NVM_DIR` will continue to be used for all other operations.
 
 ### Nvm Completion
 
-`nvm` comes with a default bash_completion profile. If you want to enable it, you can do it by exporting  the `NVM_COMPLETION` environment variable and setting it to `true`. It must be set before `zsh-nvm` is loaded.
+`nvm` comes with a default bash_completion profile. If you want to enable it, you can do it by exporting the `NVM_COMPLETION` environment variable and setting it to `true`. It must be set before `zsh-nvm` is loaded.
 
 For example, if you are using antigen, you would put the following in your `.zshrc`:
 
 ```bash
 # Export nvm completion settings for zsh-nvm plugin
 export NVM_COMPLETION=true
-antigen bundle lukechilds/zsh-nvm
+antigen bundle Logicer16/zsh-nvm
 ```
 
 ### Lazy Loading
@@ -113,9 +86,9 @@ Performance comparison:
 ```
 
 #### Extra commands to trigger lazy loading
-By default lazy loading nvm is triggered by running the `nvm`, `node`, `npm` commands or any installed npm global binaries.
+By default lazy loading nvm is triggered by running any binary installed by nvm (`nvm`, `node`, `npm`, `yarn`, `pnpm`, `corepack`, etc.) or any installed npm global binaries.
 If you want to trigger the lazy loading via extra arbitrary commands you can define `NVM_LAZY_LOAD_EXTRA_COMMANDS` and set it to an array of commands as strings.
-This can be usefull if programs are not in the above list of binaries but do depend on the availability of `node`, e.g. a vim plugin.
+This can be useful if programs are not in the above list of binaries but do depend on the availability of `node`, e.g. a vim plugin.
 
 ```shell
 export NVM_LAZY_LOAD_EXTRA_COMMANDS=('vim')
@@ -125,7 +98,7 @@ vim --version
 
 ### Don't autoload node
 
-By default when `nvm` is loaded it'll automatically run `nvm use default` and load your default `node` version along with `npm` and any global modules. You can disable this behaviour by exporting the `NVM_NO_USE` environment variable and setting it to `true`. It must be set before `zsh-nvm` is loaded.
+By default when `nvm` is loaded it'll automatically run `nvm use default` and load your default `node` version along with `npm` and any global modules. You can disable this behaviour by exporting the `NVM_NO_USE` environment variable and setting it to `true`. This will set `nvm`'s `--no-use` flag. It must be set before `zsh-nvm` is loaded.
 
 If you enable this option you will then need to manually run `nvm use <version>` before you can use `node`.
 
@@ -133,20 +106,20 @@ For example, if you are using antigen, you would put the following in your `.zsh
 
 ```shell
 export NVM_NO_USE=true
-antigen bundle lukechilds/zsh-nvm
+antigen bundle Logicer16/zsh-nvm
 ```
 
 ### Auto use
 
-If you have lots of projects with an `.nvmrc` file you may find the auto use option helpful. If it's enabled, when you `cd` into a directory with an `.nvmrc` file, `zsh-nvm` will automatically load or install the required node version in `.nvmrc`. You can enable it by exporting the `NVM_AUTO_USE` environment variable and setting it to `true`. It must be set before `zsh-nvm` is loaded.
+If you have lots of projects with an `.nvmrc` file you may find the auto use option helpful. If it's enabled, when you `cd` into a directory with an `.nvmrc` file, `zsh-nvm` will automatically load  the required node version in `.nvmrc` if it's installed. You can enable it by exporting the `NVM_AUTO_USE` environment variable and setting it to `true`. It must be set before `zsh-nvm` is loaded.
 
-If you enable this option and don't have `nvm` loaded in the current session (`NVM_LAZY_LOAD` or `NVM_NO_USE`) it won't work until you've loaded `nvm`.
+If you enable this option alongside `NVM_LAZY_LOAD`, auto use will occur automatically once you've loaded `nvm`.
 
 For example, if you are using antigen, you would put the following in your `.zshrc`:
 
 ```shell
 export NVM_AUTO_USE=true
-antigen bundle lukechilds/zsh-nvm
+antigen bundle Logicer16/zsh-nvm
 ```
 
 ## Installation
@@ -156,14 +129,14 @@ antigen bundle lukechilds/zsh-nvm
 Bundle `zsh-nvm` in your `.zshrc`
 
 ```shell
-antigen bundle lukechilds/zsh-nvm
+antigen bundle Logicer16/zsh-nvm
 ```
 
 ### Using [zplug](https://github.com/b4b4r07/zplug)
 Load `zsh-nvm` as a plugin in your `.zshrc`
 
 ```shell
-zplug "lukechilds/zsh-nvm"
+zplug "Logicer16/zsh-nvm"
 
 ```
 ### Using [zgen](https://github.com/tarjoilija/zgen)
@@ -171,7 +144,7 @@ zplug "lukechilds/zsh-nvm"
 Include the load command in your `.zshrc`
 
 ```shell
-zgen load lukechilds/zsh-nvm
+zgen load Logicer16/zsh-nvm
 ```
 
 ### As an [Oh My ZSH!](https://github.com/robbyrussell/oh-my-zsh) custom plugin
@@ -179,7 +152,7 @@ zgen load lukechilds/zsh-nvm
 Clone `zsh-nvm` into your custom plugins repo
 
 ```shell
-git clone https://github.com/lukechilds/zsh-nvm ~/.oh-my-zsh/custom/plugins/zsh-nvm
+git clone https://github.com/Logicer16/zsh-nvm ~/.oh-my-zsh/custom/plugins/zsh-nvm
 ```
 Then load as a plugin in your `.zshrc`
 
@@ -193,7 +166,7 @@ Keep in mind that plugins need to be added before `oh-my-zsh.sh` is sourced.
 Clone this repository somewhere (`~/.zsh-nvm` for example)
 
 ```shell
-git clone https://github.com/lukechilds/zsh-nvm.git ~/.zsh-nvm
+git clone https://github.com/Logicer16/zsh-nvm.git ~/.zsh-nvm
 ```
 Then source it in your `.zshrc` (or `.bashrc`)
 
@@ -217,8 +190,6 @@ Run the tests with:
 urchin -s zsh tests
 ```
 
-
-
 ## Related
 
 - [`zsh-better-npm-completion`](https://github.com/lukechilds/zsh-better-npm-completion) - Better completion for `npm`
@@ -226,3 +197,4 @@ urchin -s zsh tests
 ## License
 
 MIT © Luke Childs
+MIT © Logicer
