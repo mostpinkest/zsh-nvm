@@ -4,8 +4,12 @@ _zsh_nvm_has() {
   type "$1" > /dev/null 2>&1
 }
 
+_zsh_nvm_is_brew_nvm() {
+  _zsh_nvm_has brew && ls $(brew --prefix)/opt/ | grep -q nvm
+}
+
 nvm_system_install_dir() {
-  if _zsh_nvm_has brew && ls $(brew --prefix)/opt/ | grep -q nvm; then
+  if _zsh_nvm_is_brew_nvm; then
     echo "$(brew --prefix)/opt/nvm"
   else
     echo $NVM_DIR
@@ -75,9 +79,10 @@ _zsh_nvm_load() {
 }
 
 _zsh_nvm_completion() {
+  completion_dir_suffix=$(_zsh_nvm_is_brew_nvm && echo "etc/bash_completion.d/nvm" || echo "bash_completion")
 
   # Add provided nvm completion
-  [[ -r $NVM_SYS_DIR/bash_completion ]] && source $NVM_SYS_DIR/bash_completion
+  [[ -r $NVM_SYS_DIR/$completion_dir_suffix ]] && source $NVM_SYS_DIR/$completion_dir_suffix
 }
 
 _zsh_nvm_lazy_load() {
