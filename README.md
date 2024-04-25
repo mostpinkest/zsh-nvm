@@ -1,6 +1,7 @@
 # zsh-nvm
 
 > Zsh plugin for loading `nvm`
+
 ![GitHub Actions Test Status](https://img.shields.io/github/actions/workflow/status/Logicer16/zsh-nvm/test.yml?label=test)
 
 [`nvm`](https://github.com/nvm-sh/nvm) is an awesome tool but it can be kind of a pain to install and keep up to date. This zsh plugin removes the need for you to configure nvm yourself in most cases, so you never worry about it again.
