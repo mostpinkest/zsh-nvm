@@ -2,7 +2,7 @@
 
 > Zsh plugin for loading `nvm`
 
-![GitHub Actions Test Status](https://img.shields.io/github/actions/workflow/status/Logicer16/zsh-nvm/test.yml?label=test)
+![GitHub Actions Test Status](https://img.shields.io/github/actions/workflow/status/mostpinkest/zsh-nvm/test.yml?label=test)
 
 [`nvm`](https://github.com/nvm-sh/nvm) is an awesome tool but it can be kind of a pain to install and keep up to date. This zsh plugin removes the need for you to configure nvm yourself in most cases, so you never worry about it again.
 
@@ -45,7 +45,7 @@ For example, if you are using antigen, you would put the following in your `.zsh
 
 ```shell
 export NVM_DIR="$HOME/.custom-nvm-dir"
-antigen bundle Logicer16/zsh-nvm
+antigen bundle mostpinkest/zsh-nvm
 ```
 
 > [!NOTE]
@@ -60,7 +60,7 @@ For example, if you are using antigen, you would put the following in your `.zsh
 ```bash
 # Export nvm completion settings for zsh-nvm plugin
 export NVM_COMPLETION=true
-antigen bundle Logicer16/zsh-nvm
+antigen bundle mostpinkest/zsh-nvm
 ```
 
 ### Lazy Loading
@@ -73,7 +73,7 @@ For example, if you are using antigen, you would put the following in your `.zsh
 
 ```shell
 export NVM_LAZY_LOAD=true
-antigen bundle Logicer16/zsh-nvm
+antigen bundle mostpinkest/zsh-nvm
 ```
 
 Performance comparison:
@@ -110,7 +110,7 @@ For example, if you are using antigen, you would put the following in your `.zsh
 
 ```shell
 export NVM_NO_USE=true
-antigen bundle Logicer16/zsh-nvm
+antigen bundle mostpinkest/zsh-nvm
 ```
 
 ### Auto use
@@ -123,7 +123,7 @@ For example, if you are using antigen, you would put the following in your `.zsh
 
 ```shell
 export NVM_AUTO_USE=true
-antigen bundle Logicer16/zsh-nvm
+antigen bundle mostpinkest/zsh-nvm
 ```
 
 ## Installation
@@ -133,14 +133,14 @@ antigen bundle Logicer16/zsh-nvm
 Bundle `zsh-nvm` in your `.zshrc`
 
 ```shell
-antigen bundle Logicer16/zsh-nvm
+antigen bundle mostpinkest/zsh-nvm
 ```
 
 ### Using [zplug](https://github.com/b4b4r07/zplug)
 Load `zsh-nvm` as a plugin in your `.zshrc`
 
 ```shell
-zplug "Logicer16/zsh-nvm"
+zplug "mostpinkest/zsh-nvm"
 
 ```
 ### Using [zgen](https://github.com/tarjoilija/zgen)
@@ -148,7 +148,7 @@ zplug "Logicer16/zsh-nvm"
 Include the load command in your `.zshrc`
 
 ```shell
-zgen load Logicer16/zsh-nvm
+zgen load mostpinkest/zsh-nvm
 ```
 
 ### As an [Oh My ZSH!](https://github.com/robbyrussell/oh-my-zsh) custom plugin
@@ -156,7 +156,7 @@ zgen load Logicer16/zsh-nvm
 Clone `zsh-nvm` into your custom plugins repo
 
 ```shell
-git clone https://github.com/Logicer16/zsh-nvm ~/.oh-my-zsh/custom/plugins/zsh-nvm
+git clone https://github.com/mostpinkest/zsh-nvm ~/.oh-my-zsh/custom/plugins/zsh-nvm
 ```
 Then load as a plugin in your `.zshrc`
 
@@ -170,7 +170,7 @@ Keep in mind that plugins need to be added before `oh-my-zsh.sh` is sourced.
 Clone this repository somewhere (`~/.zsh-nvm` for example)
 
 ```shell
-git clone https://github.com/Logicer16/zsh-nvm.git ~/.zsh-nvm
+git clone https://github.com/mostpinkest/zsh-nvm.git ~/.zsh-nvm
 ```
 Then source it in your `.zshrc` (or `.bashrc`)
 
@@ -201,4 +201,4 @@ urchin -s zsh tests
 ## License
 
 MIT © Luke Childs
-MIT © Logicer
+MIT © mostpinkest
